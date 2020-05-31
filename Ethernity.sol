@@ -24,7 +24,10 @@ import "./EthernityStorage.sol";
 import "./Models.sol";
 
 contract EthernityImplementationV1 is EthernityStorage {
-
+    event _addDPRequestEV(address indexed _from, uint _rowNumber);
+    event _addDORequestEV(address indexed _from, uint _rowNumber);
+    event _placeOrderEV(address indexed _from, uint _orderNumber);
+    
     function _addDPRequest(
         uint8 _cpuRequest,
         uint8 _memRequest,
@@ -39,22 +42,26 @@ contract EthernityImplementationV1 is EthernityStorage {
     ) public onlyDelegate returns (uint _rowNumber)
     {
 
+        //validate cpu
         require(
             _cpuRequest > 0 && _cpuRequest <= MAX_CPU,
             "cpuRequest is invalid");
+        //validate memory
         require(
             _memRequest > 0 && _memRequest <= MAX_MEMORY,
             "memRequest is invalid");
+        //validate _bandwidthRequest
         require(
             _bandwidthRequest > 0 && _bandwidthRequest <= MAX_BANDWIDTH,
             "bandwidthRequest is invalid");
+        //validate memory
         require(
             _storageRequest > 0 && _storageRequest <= MAX_STORAGE,
             "storageRequest is invalid");
 
 
         usersDPRequests[msg.sender].push(dpRequestsList.length);
-        return dpRequestsList.push(Models.DPRequest({
+        _rowNumber = dpRequestsList.push(Models.DPRequest({
             dproc: msg.sender,
             cpuRequest : _cpuRequest,
             memoryRequest : _memRequest,
@@ -71,6 +78,9 @@ contract EthernityImplementationV1 is EthernityStorage {
             Metadata3 : _metadata3,
             Metadata4 : _metadata4
             })) - 1;
+            
+        emit _addDPRequestEV(msg.sender, _rowNumber);
+        return _rowNumber;
     }
 
     function _getDPRequestsCount() public constant onlyDelegate returns (uint256 _length) {
@@ -240,7 +250,7 @@ contract EthernityImplementationV1 is EthernityStorage {
             "storageRequest is invalid");
 
         usersDORequests[msg.sender].push(doRequestsList.length);
-        return doRequestsList.push(Models.DORequest({
+         _rowNumber = doRequestsList.push(Models.DORequest({
             downer : msg.sender,
             cpuRequest : _cpuRequest,
             memoryRequest : _memRequest,
@@ -259,7 +269,8 @@ contract EthernityImplementationV1 is EthernityStorage {
             Metadata3 : _metadata3,
             Metadata4 : _metadata4
             })) - 1;
-
+        emit _addDORequestEV(msg.sender, _rowNumber);
+        return _rowNumber;
     }
 
     function _getDORequestsCount() public constant onlyDelegate returns (uint256 _length) {
@@ -425,7 +436,7 @@ contract EthernityImplementationV1 is EthernityStorage {
         usersOrders[dpRequest.dproc].push(orders.length);
         usersOrders[doRequest.downer].push(orders.length);
 
-        return orders.push(Models.Order({
+        _orderNumber = orders.push(Models.Order({
             instance : doRequest.bookedInstances,
             dproc : dpRequest.dproc,
             downer : doRequest.downer,
@@ -439,6 +450,9 @@ contract EthernityImplementationV1 is EthernityStorage {
             price : 0,
             result : ''
             })) - 1;
+        
+        emit _placeOrderEV(msg.sender, _orderNumber);
+        return _orderNumber;
 
     }
 
@@ -572,3 +586,4 @@ contract EthernityImplementationV1 is EthernityStorage {
         return order.result;
     }
 }
+
