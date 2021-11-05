@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.5.17;
 
 /**
  * Copyright (C) 2018, 2019, 2020 Ethernity HODL UG
@@ -21,21 +21,21 @@ pragma solidity ^0.4.18;
 
 import "./Owned.sol";
 
-contract Delegated is Owned{
-    address public caller;
+contract Delegated is Owned {
+    address public callerAddress;
 
     event ProxyTransferred(address indexed _from, address indexed _to);
 
-    function Delegated() public {
-        caller = msg.sender;
+    constructor() public {
+        callerAddress = msg.sender;
     }
 
     modifier onlyDelegate {
-        require(msg.sender == caller);
+        require(msg.sender == callerAddress);
         _;
     }
 
     function transferProxy(address _newProxy) public onlyOwner {
-        caller = _newProxy;
+        callerAddress = _newProxy;
     }
 }

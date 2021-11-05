@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.5.17;
 
 /**
  * Copyright (C) 2018, 2019, 2020 Ethernity HODL UG
@@ -24,7 +24,7 @@ import "./EthernityStorage.sol";
 
 contract EthernityRegistry is EthernityStorage {
 
-    constructor()public{
+    constructor() public {
         versions.push(address(0));
         versionsPro.push(address(0));
     }
@@ -57,8 +57,8 @@ contract EthernityRegistry is EthernityStorage {
      * to the given implementation. This function will return
      * whatever the implementation call returns
      */
-    function() payable public {
 
+    function _fallback() internal {
         address target = address(0);
         if (usersPro[msg.sender] == true) {
             target = implementationPro;
@@ -67,27 +67,60 @@ contract EthernityRegistry is EthernityStorage {
         }
 
         require(target != address(0));
-        caller = msg.sender;
-        
+        callerAddress = msg.sender;
+
         assembly {
             let ptr := mload(0x40)
             let size := and(add(calldatasize, 0x1f), not(0x1f))
             mstore(0x40, add(ptr, size))
             calldatacopy(ptr, 0, calldatasize)
             let result := delegatecall(gas, target, ptr, calldatasize, 0, 0)
-            
+
             switch result
             case 0 {
-                revert(0,0)
+                revert(0, 0)
             } default {
                 let retptr := mload(0x40)
                 mstore(0x40, add(retptr, returndatasize))
                 returndatacopy(retptr, 0x0, returndatasize)
-                return(retptr, returndatasize)
+                return (retptr, returndatasize)
             }
         }
     }
 
+    function() payable external {
+        _fallback();
+    }
+
+    function transfer(address to, uint tokens) public returns (bool success) {
+        _fallback();
+    }
+
+    function transferFrom(address from, address to, uint tokens) public returns (bool success) {
+        _fallback();
+    }
+
+    function approve(address spender, uint tokens) public returns (bool success) {
+        _fallback();
+    }
+
+    function approveAndCall(address spender, uint tokens, bytes memory data) public returns (bool success) {
+        _fallback();
+    }
+
+    function _addProUser(address userPro) public onlyOwner returns (bool){
+        usersPro[userPro] = true;
+        return true;
+    }
+
+    function _removeProUser(address userPro) public onlyOwner returns (bool){
+        usersPro[userPro] = false;
+        return true;
+    }
+
+    function _checkProUser(address userPro) public onlyOwner view returns (bool){
+        return usersPro[userPro];
+    }
 
     /**
     * @dev Sets the address of the current implementation
@@ -103,24 +136,10 @@ contract EthernityRegistry is EthernityStorage {
         versionsPro.push(_newImp);
     }
 
-    function _addProUser(address userPro) public onlyOwner returns (bool){
-        usersPro[userPro] = true;
-        return true;
-    }
-
-    function _removeProUser(address userPro) public onlyOwner returns (bool){
-        usersPro[userPro] = false;
-        return true;
-    }
-
-    function _checkProUser(address userPro) public onlyOwner constant returns (bool){
-        return usersPro[userPro];
-    }
-
     /**
     * returns true for pro users | false for community
     */
-    function _checkSubscription() public constant returns (bool){
+    function _checkSubscription() public view returns (bool){
         return usersPro[msg.sender];
     }
 }

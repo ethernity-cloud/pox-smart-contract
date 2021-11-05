@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.5.17;
 
 /**
  * Copyright (C) 2018, 2019, 2020 Ethernity HODL UG

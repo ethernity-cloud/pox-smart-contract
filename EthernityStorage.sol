@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.5.17;
 
 /**
  * Copyright (C) 2018, 2019, 2020 Ethernity HODL UG
@@ -24,14 +24,14 @@ import "./StandardToken.sol";
 
 contract EthernityStorage is StandardToken {
 
-    constructor()public{
+    constructor() public{
         name = "Ethernity Token";
         symbol = "ETNY";
         decimals = 18;
 
         _totalSupply = 1000000000 * 10 ** uint(decimals);
         balances[owner] = _totalSupply;
-        Transfer(address(0), owner, _totalSupply);
+        emit Transfer(address(0), owner, _totalSupply);
     }
 
     modifier onlyOwner() {
@@ -48,6 +48,17 @@ contract EthernityStorage is StandardToken {
     address[] internal versions;
     address[] internal versionsPro;
     mapping(address => bool) usersPro;
+
+    uint128 internal baseLockDate = 1688169599; // Fri Jun 30 2023 23:59:59 GMT+0000
+    uint128 constant internal twoYears = 63072000;
+    uint128 constant internal oneYear = 31536000;
+    uint128 constant internal sixMonths = 15780000;
+
+    mapping(address => uint128) lockTime;
+
+    mapping(address => uint256) attestation;
+    mapping(address => uint256) aggregation;
+    mapping(address => uint256) proposal;
 
     uint16 constant internal HOURS_IN_SECONDS = 3600;
     uint8 constant internal MAX_CPU = 255;

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.5.17;
 
 /**
  * Copyright (C) 2018, 2019, 2020 Ethernity HODL UG
@@ -27,7 +27,7 @@ contract EthernityImplementationV1 is EthernityStorage {
     event _addDPRequestEV(address indexed _from, uint _rowNumber);
     event _addDORequestEV(address indexed _from, uint _rowNumber);
     event _placeOrderEV(address indexed _from, uint _orderNumber);
-    
+
     function _addDPRequest(
         uint8 _cpuRequest,
         uint8 _memRequest,
@@ -35,13 +35,12 @@ contract EthernityImplementationV1 is EthernityStorage {
         uint8 _bandwidthRequest,
         uint16 _duration,
         uint8 _minPrice,
-        string _metadata1,
-        string _metadata2,
-        string _metadata3,
-        string _metadata4
+        string memory  _metadata1,
+        string memory _metadata2,
+        string memory _metadata3,
+        string memory _metadata4
     ) public onlyDelegate returns (uint _rowNumber)
     {
-
         //validate cpu
         require(
             _cpuRequest > 0 && _cpuRequest <= MAX_CPU,
@@ -78,17 +77,17 @@ contract EthernityImplementationV1 is EthernityStorage {
             Metadata3 : _metadata3,
             Metadata4 : _metadata4
             })) - 1;
-            
+
         emit _addDPRequestEV(msg.sender, _rowNumber);
         return _rowNumber;
     }
 
-    function _getDPRequestsCount() public constant onlyDelegate returns (uint256 _length) {
+    function _getDPRequestsCount() public view onlyDelegate returns (uint256 _length) {
 
         return dpRequestsList.length;
     }
 
-    function _getDPRequest(uint256 _requestListItem) public constant onlyDelegate returns (
+    function _getDPRequest(uint256 _requestListItem) public view onlyDelegate returns (
         address dproc,
         uint8 cpuRequest,
         uint8 memoryRequest,
@@ -117,20 +116,20 @@ contract EthernityImplementationV1 is EthernityStorage {
         status
         );
     }
-    
-    function _getDPRequestMetadata(uint256 _requestListItem) public constant onlyDelegate returns (
+
+    function _getDPRequestMetadata(uint256 _requestListItem) public view onlyDelegate returns (
         address dproc,
-        string metadata1,
-        string metadata2,
-        string metadata3,
-        string metadata4)
+        string memory metadata1,
+        string memory metadata2,
+        string memory metadata3,
+        string memory metadata4)
     {
         require(
             _requestListItem >= 0 && _requestListItem < dpRequestsList.length,
             "invalid request index");
-            
+
         Models.DPRequest storage request = dpRequestsList[_requestListItem];
-        
+
         return (
         request.dproc,
         request.Metadata1,
@@ -139,8 +138,8 @@ contract EthernityImplementationV1 is EthernityStorage {
         request.Metadata4
         );
     }
-    
-    
+
+
 
     function _cancelDPRequest(uint256 _requestListItem) public onlyDelegate {
         require(
@@ -158,7 +157,7 @@ contract EthernityImplementationV1 is EthernityStorage {
         request.status = Models.RequestStatus.CANCELED;
     }
 
-    function _getMyDPRequests() public constant onlyDelegate returns (uint256[] req){
+    function _getMyDPRequests() public view onlyDelegate returns (uint256[] memory req){
 
         return usersDPRequests[msg.sender];
     }
@@ -166,7 +165,7 @@ contract EthernityImplementationV1 is EthernityStorage {
     /**
     ** metadata storage part
     */
-    function _addMetadataToDPRequest(uint256 _requestListItem, string _key, string _value) public onlyDelegate returns (uint _rowNumber){
+    function _addMetadataToDPRequest(uint256 _requestListItem, string memory _key, string memory _value) public onlyDelegate returns (uint _rowNumber){
 
         require(
             _requestListItem >= 0 && _requestListItem < dpRequestsList.length,
@@ -184,7 +183,7 @@ contract EthernityImplementationV1 is EthernityStorage {
         return request.metadataSize - 1;
     }
 
-    function _getMetadataCountForDPRequest(uint256 _requestListItem) public constant onlyDelegate returns (uint256 _length){
+    function _getMetadataCountForDPRequest(uint256 _requestListItem) public view onlyDelegate returns (uint256 _length){
         require(
             _requestListItem >= 0 && _requestListItem < dpRequestsList.length,
             "invalid request index");
@@ -193,9 +192,9 @@ contract EthernityImplementationV1 is EthernityStorage {
     }
 
     function _getMetadataValueForDPRequest(uint256 _requestListItem, uint256 _metadataItem) onlyDelegate
-    public constant returns (
-        string key,
-        string value
+    public view returns (
+        string memory key,
+        string memory value
     ){
         require(
             _requestListItem >= 0 && _requestListItem < dpRequestsList.length,
@@ -222,10 +221,10 @@ contract EthernityImplementationV1 is EthernityStorage {
         uint16 _duration,
         uint8 _instances,
         uint8 _maxPrice,
-        string _metadata1,
-        string _metadata2,
-        string _metadata3,
-        string _metadata4
+        string memory _metadata1,
+        string memory _metadata2,
+        string memory _metadata3,
+        string memory _metadata4
     ) public onlyDelegate returns (uint _rowNumber)
     {
 
@@ -273,13 +272,13 @@ contract EthernityImplementationV1 is EthernityStorage {
         return _rowNumber;
     }
 
-    function _getDORequestsCount() public constant onlyDelegate returns (uint256 _length) {
+    function _getDORequestsCount() public view onlyDelegate returns (uint256 _length) {
 
         return doRequestsList.length;
     }
 
 
-    function _getDORequest(uint256 _requestListItem) public constant onlyDelegate returns (
+    function _getDORequest(uint256 _requestListItem) public view onlyDelegate returns (
         address downer,
         uint8 cpuRequest,
         uint8 memoryRequest,
@@ -307,13 +306,13 @@ contract EthernityImplementationV1 is EthernityStorage {
         status
         );
     }
-    
-    function _getDORequestMetadata(uint256 _requestListItem) public constant onlyDelegate returns (
+
+    function _getDORequestMetadata(uint256 _requestListItem) public view onlyDelegate returns (
         address downer,
-        string metadata1,
-        string metadata2,
-        string metadata3,
-        string metadata4)
+        string memory metadata1,
+        string memory metadata2,
+        string memory metadata3,
+        string memory metadata4)
     {
         require(
             _requestListItem >= 0 && _requestListItem < doRequestsList.length,
@@ -345,12 +344,12 @@ contract EthernityImplementationV1 is EthernityStorage {
         request.status = Models.RequestStatus.CANCELED;
     }
 
-    function _getMyDORequests() public constant onlyDelegate returns (uint256[] req){
+    function _getMyDORequests() public view onlyDelegate returns (uint256[] memory req){
 
         return usersDORequests[msg.sender];
     }
 
-    function _addMetadataToRequest(uint256 _requestListItem, string _key, string _value) public onlyDelegate returns (uint _rowNumber){
+    function _addMetadataToRequest(uint256 _requestListItem, string memory _key, string memory _value) public onlyDelegate returns (uint _rowNumber){
 
         require(
             _requestListItem >= 0 && _requestListItem < doRequestsList.length,
@@ -368,7 +367,7 @@ contract EthernityImplementationV1 is EthernityStorage {
         return request.metadataSize - 1;
     }
 
-    function _getMetadataCountForRequest(uint256 _requestListItem) public constant onlyDelegate returns (uint256 _length){
+    function _getMetadataCountForRequest(uint256 _requestListItem) public view onlyDelegate returns (uint256 _length){
         require(
             _requestListItem >= 0 && _requestListItem < doRequestsList.length,
             "invalid request index");
@@ -377,9 +376,9 @@ contract EthernityImplementationV1 is EthernityStorage {
     }
 
     function _getMetadataValueForRequest(uint256 _requestListItem, uint256 _metadataItem) onlyDelegate
-    public constant returns (
-        string key,
-        string value
+    public view returns (
+        string memory key,
+        string memory value
     ){
         require(
             _requestListItem >= 0 && _requestListItem < doRequestsList.length,
@@ -450,24 +449,24 @@ contract EthernityImplementationV1 is EthernityStorage {
             price : 0,
             result : ''
             })) - 1;
-        
+
         emit _placeOrderEV(msg.sender, _orderNumber);
         return _orderNumber;
 
     }
 
-    function _getOrdersCount() public constant onlyDelegate returns (uint256 _length) {
+    function _getOrdersCount() public view onlyDelegate returns (uint256 _length) {
 
         return orders.length;
     }
 
-    function _getMyDOOrders() public constant onlyDelegate returns (uint256[] req){
+    function _getMyDOOrders() public view onlyDelegate returns (uint256[] memory req){
 
         return usersOrders[msg.sender];
     }
 
 
-    function _getOrder(uint256 _orderItem) public onlyDelegate constant returns (
+    function _getOrder(uint256 _orderItem) public onlyDelegate view returns (
         address downer,
         address dproc,
         uint doRequest,
@@ -483,11 +482,11 @@ contract EthernityImplementationV1 is EthernityStorage {
         orders[_orderItem].dproc,
         orders[_orderItem].doRequest,
         orders[_orderItem].dpRequest,
-        uint(orders[_orderItem].status)    
+        uint(orders[_orderItem].status)
         );
     }
-    
-    
+
+
     /**
     * orders can be processed only after being approved
     * by other part(do/dp)
@@ -534,15 +533,15 @@ contract EthernityImplementationV1 is EthernityStorage {
             order.status == Models.OrderStatus.PROCESSING,
             "only open orders can be approved"
         );
-        
+
         order.processor = processor;
         return true;
     }
-    
+
     /**
     * add result to order
     */
-    function _addResultToOrder(uint256 _orderItem, string _result) public onlyDelegate returns (bool success){
+    function _addResultToOrder(uint256 _orderItem, string memory _result) public onlyDelegate returns (bool success){
         require(
             _orderItem >= 0 && _orderItem < orders.length,
             "invalid order index");
@@ -563,11 +562,11 @@ contract EthernityImplementationV1 is EthernityStorage {
         order.status = Models.OrderStatus.CLOSED;
         return true;
     }
-    
+
     /**
     * get result from order
     */
-    function _getResultFromOrder(uint256 _orderItem) public constant onlyDelegate returns (string _Result){
+    function _getResultFromOrder(uint256 _orderItem) public view onlyDelegate returns (string memory _Result){
         require(
             _orderItem >= 0 && _orderItem < orders.length,
             "invalid order index");
@@ -577,7 +576,7 @@ contract EthernityImplementationV1 is EthernityStorage {
         require(
             msg.sender == order.downer,
             "only owner can read the results");
-    
+
         require(
             order.status == Models.OrderStatus.CLOSED,
             "only closed orders have the result"
@@ -585,5 +584,85 @@ contract EthernityImplementationV1 is EthernityStorage {
 
         return order.result;
     }
-}
 
+
+    function _addToSeedRound(address addr) public onlyOwner returns (bool){
+        lockTime[addr] = twoYears;
+        return true;
+    }
+
+    function _addToPrivateSaleRound(address addr) public onlyOwner returns (bool){
+        lockTime[addr] = twoYears;
+        return true;
+    }
+
+    function _addToPresaleRound(address addr) public onlyOwner returns (bool){
+        lockTime[addr] = oneYear;
+        return true;
+    }
+
+    function _addToPublicOneRound(address addr) public onlyOwner returns (bool){
+        lockTime[addr] =  oneYear;
+        return true;
+    }
+
+    function _addToPublicTwoRound(address addr) public onlyOwner returns (bool){
+        lockTime[addr] =  sixMonths;
+        return true;
+    }
+
+    function _removeLockoutTimestamp(address addr) public onlyOwner returns (bool){
+        lockTime[addr] = 0;
+        return true;
+    }
+
+    function _getLockoutTimestamp(address addr) public view returns (uint128){
+        return lockTime[addr] + baseLockDate;
+    }
+
+    function _setBaseLockTimestamp(uint128 timestamp) public returns (bool) {
+        baseLockDate = timestamp;
+        return true;
+    }
+
+    function _getBaseLockTimestamp() public view returns (uint128) {
+        return baseLockDate;
+    }
+
+    function _isAddressLocked(address addr) internal view returns (bool){
+        if(baseLockDate > block.timestamp) return true;
+        if(_getLockoutTimestamp(addr) > block.timestamp) return true;
+        return false;
+    }
+
+    function transfer(address to, uint tokens) public returns (bool success){
+        if(_isAddressLocked(msg.sender)) revert();
+        balances[msg.sender] = balances[msg.sender].sub(tokens);
+        balances[to] = balances[to].add(tokens);
+        emit Transfer(msg.sender, to, tokens);
+        return true;
+    }
+
+    function transferFrom(address from, address to, uint tokens) public returns (bool success){
+        if(_isAddressLocked(msg.sender)) revert();
+        balances[from] = balances[from].sub(tokens);
+        allowed[from][msg.sender] = allowed[from][msg.sender].sub(tokens);
+        balances[to] = balances[to].add(tokens);
+        emit Transfer(from, to, tokens);
+        return true;
+    }
+
+    function approve(address spender, uint tokens) public returns (bool success){
+        if(_isAddressLocked(msg.sender)) revert();
+        allowed[msg.sender][spender] = tokens;
+        emit Approval(msg.sender, spender, tokens);
+        return true;
+    }
+
+    function approveAndCall(address spender, uint tokens, bytes memory data) public returns (bool success){
+        if(_isAddressLocked(msg.sender)) revert();allowed[msg.sender][spender] = tokens;
+        emit Approval(msg.sender, spender, tokens);
+        ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, address(this), data);
+        return true;
+    }
+}
